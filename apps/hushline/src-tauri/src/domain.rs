@@ -8,13 +8,20 @@ pub struct TranscriptionRequest {
     pub language: String,
     pub model: String,
     pub output_dir: Option<PathBuf>,
+    pub force: bool,
 }
 
+#[derive(Clone)]
 pub struct TranscriptionResult {
+    pub url: String,
     pub title: String,
     pub transcript: String,
     pub transcript_path: PathBuf,
     pub audio_path: PathBuf,
+    pub json_path: PathBuf,
+    pub language: String,
+    pub model: String,
+    pub cached: bool,
     pub duration_seconds: Option<f64>,
 }
 
@@ -111,6 +118,7 @@ mod tests {
             language: "auto".into(),
             model: "base".into(),
             output_dir: None,
+            force: false,
         };
         assert!(validate_request(&request).is_err());
     }

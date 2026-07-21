@@ -1,5 +1,8 @@
 use crate::{
-    domain::{model_file, ModelStatus, ToolStatus, TranscriptChunk, VideoMetadata, MODELS},
+    domain::{
+        model_file, ModelStatus, ToolStatus, TranscriptChunk, TranscriptionResult, VideoMetadata,
+        MODELS,
+    },
     ports::{EventPort, ToolchainPort},
 };
 use std::{
@@ -12,6 +15,49 @@ use std::{
 };
 
 pub struct SystemToolchain;
+
+#[derive(serde::Serialize, serde::Deserialize)]
+struct StoredResult {
+    schema_version: u8,
+    url: String,
+    title: String,
+    transcript: String,
+    transcript_path: String,
+    audio_path: String,
+    language: String,
+    model: String,
+    duration_seconds: Option<f64>,
+}
+
+impl StoredResult {
+    fn from_domain(result: &TranscriptionResult) -> Self {
+        Self {
+            schema_version: 1,
+            url: result.url.clone(),
+            title: result.title.clone(),
+            transcript: result.transcript.clone(),
+            transcript_path: result.transcript_path.display().to_string(),
+            audio_path: result.audio_path.display().to_string(),
+            language: result.language.clone(),
+            model: result.model.clone(),
+            duration_seconds: result.duration_seconds,
+        }
+    }
+    fn into_domain(self, json_path: PathBuf) -> TranscriptionResult {
+        TranscriptionResult {
+            url: self.url,
+            title: self.title,
+            transcript: self.transcript,
+            transcript_path: self.transcript_path.into(),
+            audio_path: self.audio_path.into(),
+            json_path,
+            language: self.language,
+            model: self.model,
+            cached: true,
+            duration_seconds: self.duration_seconds,
+        }
+    }
+}
 
 impl SystemToolchain {
     pub fn new() -> Self {
@@ -327,6 +373,51 @@ impl ToolchainPort for SystemToolchain {
 
     fn read_text(&self, path: &Path) -> Result<String, String> {
         fs::read_to_string(path).map_err(|e| format!("변환된 텍스트를 읽지 못했습니다: {e}"))
+    }
+
+    fn find_result(
+        &self,
+        output_dir: &Path,
+        url: &str,
+    ) -> Result<Option<TranscriptionResult>, String> {
+        let entries = match fs::read_dir(output_dir) {
+            Ok(entries) => entries,
+            Err(error) if error.kind() == std::io::ErrorKind::NotFound => return Ok(None),
+            Err(error) => return Err(format!("결과 폴더를 읽지 못했습니다: {error}")),
+        };
+        for entry in entries.flatten() {
+            let path = entry.path();
+            if !path
+                .file_name()
+                .and_then(|name| name.to_str())
+                .is_some_and(|name| name.ends_with(".hushline.json"))
+            {
+                continue;
+            }
+            let Ok(content) = fs::read_to_string(&path) else {
+                continue;
+            };
+            let Ok(stored) = serde_json::from_str::<StoredResult>(&content) else {
+                continue;
+            };
+            if stored.url == url {
+                return Ok(Some(stored.into_domain(path)));
+            }
+        }
+        Ok(None)
+    }
+
+    fn save_result(
+        &self,
+        output_dir: &Path,
+        base_name: &str,
+        result: &TranscriptionResult,
+    ) -> Result<PathBuf, String> {
+        let path = output_dir.join(format!("{base_name}.hushline.json"));
+        let json = serde_json::to_string_pretty(&StoredResult::from_domain(result))
+            .map_err(|e| format!("JSON 결과 생성 실패: {e}"))?;
+        fs::write(&path, json).map_err(|e| format!("JSON 결과 저장 실패: {e}"))?;
+        Ok(path)
     }
 
     fn model_statuses(&self) -> Vec<ModelStatus> {

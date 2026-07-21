@@ -65,6 +65,14 @@ impl<'a> HushlineService<'a> {
             .clone()
             .unwrap_or_else(|| self.tools.default_output_dir());
         self.tools.ensure_directory(&output_dir)?;
+        if !request.force {
+            if let Some(mut cached) = self.tools.find_result(&output_dir, &request.url)? {
+                cached.cached = true;
+                self.events
+                    .progress("done", 100, "이미 변환된 결과를 불러왔습니다", None);
+                return Ok(cached);
+            }
+        }
 
         self.events
             .progress("metadata", 6, "영상 제목과 길이를 확인하는 중…", None);
@@ -98,14 +106,21 @@ impl<'a> HushlineService<'a> {
             self.events,
         )?;
         let transcript = self.tools.read_text(&transcript_path)?;
-        self.events
-            .progress("done", 100, "텍스트 변환이 완료되었습니다", None);
-        Ok(TranscriptionResult {
+        let mut result = TranscriptionResult {
+            url: request.url,
             title: metadata.title,
             transcript,
             transcript_path,
             audio_path,
+            json_path: output_dir.join(format!("{base_name}.hushline.json")),
+            language: request.language,
+            model: request.model,
+            cached: false,
             duration_seconds: metadata.duration_seconds,
-        })
+        };
+        result.json_path = self.tools.save_result(&output_dir, &base_name, &result)?;
+        self.events
+            .progress("done", 100, "텍스트 변환이 완료되었습니다", None);
+        Ok(result)
     }
 }

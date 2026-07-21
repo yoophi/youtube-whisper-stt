@@ -1,13 +1,14 @@
 import type { ReactNode } from "react";
-import { Check, ChevronDown, CircleAlert, Download, FolderOpen, Languages, LoaderCircle, Mic2, RotateCcw, Settings2, Trash2, Youtube } from "lucide-react";
+import { Check, ChevronDown, CircleAlert, Download, FolderOpen, Languages, ListPlus, LoaderCircle, RotateCcw, Settings2, Trash2, Youtube } from "lucide-react";
 import { useTranscriptionWorkspace } from "../../../features/transcribe-video";
 import { ModelStatusPanel } from "../../../features/manage-whisper-model";
 import { Button, Input, Select } from "../../../shared/ui";
 import { AppHeader } from "../../../widgets/app-header";
-import { TranscriptPanel } from "../../../widgets/transcript-panel";
+import { QueuePanel } from "../../../widgets/queue-panel";
+import { ResultGrid } from "../../../widgets/result-grid";
 
 export function TranscriptionPage() {
-  const { url, setUrl, language, setLanguage, model, setModel, outputDir, stage, progress, message, result, tools, copied, streamLines, liveTranscript, models, modelDownload, busy, urlValid, canStart, selectedModelDownloaded, stageLabel, start, downloadSelectedModel, deleteSelectedModel, chooseFolder, copyTranscript, resetError } = useTranscriptionWorkspace();
+  const { url, setUrl, language, setLanguage, model, setModel, outputDir, stage, progress, message, tools, liveTranscript, models, modelDownload, queue, results, highlightedUrl, urlValid, canStart, selectedModelDownloaded, stageLabel, addToQueue, removeQueueItem, rerun, downloadSelectedModel, deleteSelectedModel, chooseFolder, resetError } = useTranscriptionWorkspace();
 
   return <main className="min-h-screen bg-[#0b0d0a] text-[#f2f4ed] selection:bg-[#d8ff65] selection:text-black">
     <div className="noise" />
@@ -19,8 +20,8 @@ export function TranscriptionPage() {
           <div className="absolute right-0 top-0 h-24 w-24 bg-[#d8ff65]/[.035] blur-2xl" />
           <label className="mb-2.5 block text-xs font-medium text-[#b6bcaf]">YouTube URL</label>
           <div className="flex flex-col gap-3 sm:flex-row">
-            <div className="relative flex-1"><Youtube className="absolute left-4 top-1/2 -translate-y-1/2 text-[#737a6e]" size={18}/><Input value={url} onChange={(e) => setUrl(e.target.value)} onKeyDown={(e) => e.key === "Enter" && start()} className="pl-11 pr-10" placeholder="https://youtube.com/watch?v=…" />{url && <span className="absolute right-4 top-1/2 -translate-y-1/2">{urlValid ? <Check size={16} className="text-[#d8ff65]"/> : <CircleAlert size={16} className="text-amber-400"/>}</span>}</div>
-            <Button onClick={start} disabled={!canStart} className="h-12 min-w-40">{busy ? <><LoaderCircle size={17} className="animate-spin"/> 처리 중</> : <><Mic2 size={17}/> 변환 시작</>}</Button>
+            <div className="relative flex-1"><Youtube className="absolute left-4 top-1/2 -translate-y-1/2 text-[#737a6e]" size={18}/><Input value={url} onChange={(e) => setUrl(e.target.value)} onKeyDown={(e) => e.key === "Enter" && addToQueue()} className="pl-11 pr-10" placeholder="https://youtube.com/watch?v=…" />{url && <span className="absolute right-4 top-1/2 -translate-y-1/2">{urlValid ? <Check size={16} className="text-[#d8ff65]"/> : <CircleAlert size={16} className="text-amber-400"/>}</span>}</div>
+            <Button onClick={addToQueue} disabled={!canStart} className="h-12 min-w-40"><ListPlus size={17}/> Queue에 추가</Button>
           </div>
           {url && !urlValid && <p className="mt-2 text-xs text-amber-300/80">올바른 YouTube 또는 youtu.be 링크를 입력해 주세요.</p>}
 
@@ -41,8 +42,9 @@ export function TranscriptionPage() {
         </div>}
       </div>
 
-      <TranscriptPanel result={result} busy={busy} copied={copied} language={language} stage={stage} streamLines={streamLines} chunks={liveTranscript} onCopy={copyTranscript}/>
+      <QueuePanel items={queue} chunks={liveTranscript} onRemove={removeQueueItem}/>
     </section>
+    <ResultGrid results={results} highlightedUrl={highlightedUrl} onRerun={rerun}/>
     <footer className="relative z-10 mx-auto flex max-w-[1380px] items-center justify-end border-t border-white/[.06] px-6 py-5 text-[10px] uppercase tracking-[.14em] text-[#50564d] lg:px-10"><span>01 / LOCAL PIPELINE</span></footer>
   </main>;
 }

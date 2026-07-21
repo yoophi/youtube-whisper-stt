@@ -21,14 +21,21 @@ struct ProcessRequestDto {
     language: String,
     model: String,
     output_dir: Option<String>,
+    #[serde(default)]
+    force: bool,
 }
 
 #[derive(Serialize)]
 struct ProcessResultDto {
+    url: String,
     title: String,
     transcript: String,
     transcript_path: String,
     audio_path: String,
+    json_path: String,
+    language: String,
+    model: String,
+    cached: bool,
     duration_seconds: Option<f64>,
 }
 
@@ -169,14 +176,20 @@ async fn process_video(
             language: request.language,
             model: request.model,
             output_dir: request.output_dir.map(Into::into),
+            force: request.force,
         };
         service(&tools, &events)
             .transcribe_video(domain_request)
             .map(|result| ProcessResultDto {
+                url: result.url,
                 title: result.title,
                 transcript: result.transcript,
                 transcript_path: result.transcript_path.display().to_string(),
                 audio_path: result.audio_path.display().to_string(),
+                json_path: result.json_path.display().to_string(),
+                language: result.language,
+                model: result.model,
+                cached: result.cached,
                 duration_seconds: result.duration_seconds,
             })
     })

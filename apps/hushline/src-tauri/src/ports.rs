@@ -1,4 +1,4 @@
-use crate::domain::{ModelStatus, ToolStatus, TranscriptChunk, VideoMetadata};
+use crate::domain::{ModelStatus, ToolStatus, TranscriptChunk, TranscriptionResult, VideoMetadata};
 use std::path::{Path, PathBuf};
 
 pub trait EventPort: Send + Sync {
@@ -28,6 +28,17 @@ pub trait ToolchainPort: Send + Sync {
         events: &dyn EventPort,
     ) -> Result<PathBuf, String>;
     fn read_text(&self, path: &Path) -> Result<String, String>;
+    fn find_result(
+        &self,
+        output_dir: &Path,
+        url: &str,
+    ) -> Result<Option<TranscriptionResult>, String>;
+    fn save_result(
+        &self,
+        output_dir: &Path,
+        base_name: &str,
+        result: &TranscriptionResult,
+    ) -> Result<PathBuf, String>;
     fn model_statuses(&self) -> Vec<ModelStatus>;
     fn download_model(&self, model: &str, events: &dyn EventPort) -> Result<(), String>;
     fn delete_model(&self, model: &str) -> Result<(), String>;
