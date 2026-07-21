@@ -41,7 +41,7 @@ export function TranscriptionPage() {
         </div>}
       </div>
 
-      <TranscriptPanel result={result} busy={busy} copied={copied} language={language} stage={stage} streamLines={streamLines} chunks={liveTranscript} tools={tools} onCopy={copyTranscript}/>
+      <TranscriptPanel result={result} busy={busy} copied={copied} language={language} stage={stage} streamLines={streamLines} chunks={liveTranscript} onCopy={copyTranscript}/>
     </section>
     <footer className="relative z-10 mx-auto flex max-w-[1380px] items-center justify-end border-t border-white/[.06] px-6 py-5 text-[10px] uppercase tracking-[.14em] text-[#50564d] lg:px-10"><span>01 / LOCAL PIPELINE</span></footer>
   </main>;

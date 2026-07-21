@@ -2,8 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { fn } from "storybook/test";
 import { TranscriptPanel } from "@/widgets/transcript-panel";
 
-const tools = { yt_dlp: true, yt_dlp_version: "2026.07.18", ffmpeg: true, whisper: true };
-const meta = { title: "Atomic Design/Organisms/Transcript Panel", component: TranscriptPanel, args: { result: null, busy: false, copied: false, language: "ko", stage: "idle", streamLines: [], chunks: [], tools, onCopy: fn() } } satisfies Meta<typeof TranscriptPanel>;
+const meta = { title: "Atomic Design/Organisms/Transcript Panel", component: TranscriptPanel, args: { result: null, busy: false, copied: false, language: "ko", stage: "idle", streamLines: [], chunks: [], onCopy: fn() } } satisfies Meta<typeof TranscriptPanel>;
 export default meta;
 type Story = StoryObj<typeof meta>;
 export const Empty: Story = {};
