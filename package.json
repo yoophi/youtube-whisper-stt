@@ -2,33 +2,19 @@
   "name": "youtube-whisper-stt",
   "private": true,
   "version": "0.1.0",
-  "type": "module",
+  "packageManager": "pnpm@9.15.5",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc && vite build",
-    "preview": "vite preview",
-    "tauri": "tauri"
-  },
-  "dependencies": {
-    "@tauri-apps/api": "^2.8.0",
-    "@tauri-apps/plugin-dialog": "^2.4.0",
-    "@tauri-apps/plugin-opener": "^2.5.0",
-    "class-variance-authority": "^0.7.1",
-    "clsx": "^2.1.1",
-    "lucide-react": "^0.468.0",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
-    "tailwind-merge": "^2.6.0"
+    "dev": "turbo run dev --filter=@yoophi/hushline",
+    "build": "turbo run build",
+    "check-types": "turbo run check-types",
+    "test": "turbo run test",
+    "storybook": "turbo run storybook --filter=@yoophi/hushline",
+    "build-storybook": "turbo run build-storybook --filter=@yoophi/hushline",
+    "tauri": "turbo run tauri --filter=@yoophi/hushline --",
+    "tauri:dev": "turbo run tauri:dev --filter=@yoophi/hushline --",
+    "tauri:build": "turbo run tauri:build --filter=@yoophi/hushline"
   },
   "devDependencies": {
-    "@tauri-apps/cli": "^2.8.0",
-    "@types/react": "^18.3.12",
-    "@types/react-dom": "^18.3.1",
-    "@vitejs/plugin-react": "^4.3.4",
-    "autoprefixer": "^10.4.20",
-    "postcss": "^8.4.49",
-    "tailwindcss": "^3.4.16",
-    "typescript": "~5.6.2",
-    "vite": "^6.0.1"
+    "turbo": "^2.5.8"
   }
 }

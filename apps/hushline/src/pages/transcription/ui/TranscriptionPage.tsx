@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { Check, ChevronDown, CircleAlert, Download, FolderOpen, Languages, LoaderCircle, Mic2, RotateCcw, Settings2, Sparkles, Trash2, Youtube } from "lucide-react";
+import { Check, ChevronDown, CircleAlert, Download, FolderOpen, Languages, LoaderCircle, Mic2, RotateCcw, Settings2, Trash2, Youtube } from "lucide-react";
 import { useTranscriptionWorkspace } from "../../../features/transcribe-video";
 import { ModelStatusPanel } from "../../../features/manage-whisper-model";
 import { Button, Input, Select } from "../../../shared/ui";
@@ -15,12 +15,6 @@ export function TranscriptionPage() {
 
     <section className="relative z-10 mx-auto grid max-w-[1380px] grid-cols-1 gap-8 px-6 py-10 lg:grid-cols-[minmax(0,1.14fr)_minmax(360px,.86fr)] lg:px-10 lg:py-14">
       <div className="animate-in">
-        <div className="mb-9 max-w-2xl">
-          <div className="mb-4 flex items-center gap-2 font-mono text-[10px] uppercase tracking-[.24em] text-[#d8ff65]"><Sparkles size={13} /> YouTube to text, quietly</div>
-          <h1 className="font-display text-5xl leading-[.96] tracking-[-.045em] sm:text-6xl">소리를 걷어내고,<br/><span className="text-[#8e9586]">말만 남깁니다.</span></h1>
-          <p className="mt-5 max-w-xl text-[15px] leading-7 text-[#8f9688]">YouTube 링크 하나면 충분합니다. 영상을 내려받고 음성을 분리한 뒤, 내 컴퓨터의 Whisper 엔진으로 안전하게 텍스트를 만듭니다.</p>
-        </div>
-
         <div className="panel relative overflow-hidden p-5 sm:p-6">
           <div className="absolute right-0 top-0 h-24 w-24 bg-[#d8ff65]/[.035] blur-2xl" />
           <label className="mb-2.5 block text-xs font-medium text-[#b6bcaf]">YouTube URL</label>
@@ -49,7 +43,7 @@ export function TranscriptionPage() {
 
       <TranscriptPanel result={result} busy={busy} copied={copied} language={language} stage={stage} streamLines={streamLines} chunks={liveTranscript} tools={tools} onCopy={copyTranscript}/>
     </section>
-    <footer className="relative z-10 mx-auto flex max-w-[1380px] items-center justify-between border-t border-white/[.06] px-6 py-5 text-[10px] uppercase tracking-[.14em] text-[#50564d] lg:px-10"><span>Files never leave your machine</span><span>01 / LOCAL PIPELINE</span></footer>
+    <footer className="relative z-10 mx-auto flex max-w-[1380px] items-center justify-end border-t border-white/[.06] px-6 py-5 text-[10px] uppercase tracking-[.14em] text-[#50564d] lg:px-10"><span>01 / LOCAL PIPELINE</span></footer>
   </main>;
 }
 

@@ -1,5 +1,8 @@
 node_modules
 dist
-src-tauri/target
+target
+**/src-tauri/target
+.turbo
+storybook-static
 .DS_Store
 *.log
